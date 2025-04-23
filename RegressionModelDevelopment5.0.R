@@ -36,11 +36,11 @@ colSums(is.na(data))
 
 data <- na.omit(data[, c("Försäljningspris", "Age", "Miltal", "Hästkrafter", "Säljare", "Bränsle", "Växellåda", "Biltyp", "Drivning", "Modell", "Region")])
 
-model2 <- lm(Försäljningspris ~ Age + Miltal + Hästkrafter + Säljare + Bränsle + Växellåda + Biltyp + Drivning + Modell + Region, data = data)
+model <- lm(Försäljningspris ~ Age + Miltal + Hästkrafter + Säljare + Bränsle + Växellåda + Biltyp + Drivning + Modell + Region, data = data)
 
 #running diagnostics to evaluate teoretical assumptions
 #Non-linearity
-plot(model2, which = 1)  # Residuals vs. Fitted
+plot(model, which = 1)  # Residuals vs. Fitted
 par(mfrow = c(1, 3))
 plot(data$Age, data$Försäljningspris, xlab = "Age", ylab = "Försäljningspris")
 plot(data$Miltal, data$Försäljningspris, xlab = "Miltal", ylab = "Försäljningspris")
@@ -48,33 +48,33 @@ plot(data$Hästkrafter, data$Försäljningspris, xlab = "Hästkrafter", ylab = "
 
 #Correlated residuals
 library(lmtest)
-dwtest(model2)
-plot(resid(model2), type = "p", ylab = "Residuals", xlab = "Index")
+dwtest(model)
+plot(resid(model), type = "p", ylab = "Residuals", xlab = "Index")
 abline(h = 0, col = "red")
 
 #Heteroskedasticity
-plot(model2, which = 3)
-bptest(model2)
+plot(model, which = 3)
+bptest(model)
 
 #Non-normality of residuals
-plot(model2, which = 2)
-shapiro.test(resid(model2))
+plot(model, which = 2)
+shapiro.test(resid(model))
 
 #Outliers
-plot(model2, which = 5)
-std_resid <- rstandard(model2)
+plot(model, which = 5)
+std_resid <- rstandard(model)
 outliers <- which(abs(std_resid) > 3)
 if (length(outliers) > 0) print(data[outliers, ]) else print("No significant outliers detected.")
 
 #High leverage points
-plot(model2, which = 5)
-cooks_d <- cooks.distance(model2)
+plot(model, which = 5)
+cooks_d <- cooks.distance(model)
 high_leverage <- which(cooks_d > 4 / nrow(data))
 if (length(high_leverage) > 0) print(data[high_leverage, ]) else print("No high leverage points detected.")
 
 #Multicollinearity 
 cor(data[, c("Age", "Miltal", "Hästkrafter")], use = "complete.obs")
-vif(model2)
+vif(model)
 
 #Based on above diagnostics the below changes are applied to conform to teoretical assumptions
 #Transform variables
@@ -85,9 +85,7 @@ data$log_Miltal <- log(data$Miltal + 1)
 data$Modell <- fct_lump(data$Modell, n = 10)
 
 #Refit model without Region
-model_fixed <- lm(log_Pris ~ poly(Age, 2) + log_Miltal + Hästkrafter +
-                    Säljare + Bränsle + Växellåda + Biltyp + Drivning +
-                    Modell, data = data)
+model_fixed <- lm(log_Pris ~ poly(Age, 2) + log_Miltal + Hästkrafter + Säljare + Bränsle + Växellåda + Biltyp + Drivning + Modell, data = data)
 
 #Identify problematic points
 std_resid <- rstandard(model_fixed)
@@ -99,9 +97,7 @@ problematic <- union(outliers, high_leverage)
 #Remove those points and refit final model 
 data_clean <- data[-problematic, ]
 
-model_final <- lm(log_Pris ~ poly(Age, 2) + log_Miltal + Hästkrafter +
-                    Säljare + Bränsle + Växellåda + Biltyp + Drivning +
-                    Modell, data = data_clean)
+model_final <- lm(log_Pris ~ poly(Age, 2) + log_Miltal + Hästkrafter + Säljare + Bränsle + Växellåda + Biltyp + Drivning + Modell, data = data_clean)
 
 
 #Re-checking diagnostics

@@ -1,11 +1,9 @@
-# Load required packages
 library(httr)      # For making HTTP requests
 library(jsonlite)  # For converting R list to JSON
 
-# Define the API URL for the PersBilarA table
+
 url <- "https://api.scb.se/OV0104/v1/doris/en/ssd/TK/TK1001/TK1001A/PersBilarA"
 
-# Define the JSON query as an R list, with response format set to "xlsx"
 query <- list(
   query = list(
     list(
@@ -31,19 +29,17 @@ query <- list(
     )
   ),
   response = list(
-    format = "xlsx"  # Set the response format to Excel (xlsx)
+    format = "xlsx" 
   )
 )
 
-# Convert the query to JSON
 query_json <- toJSON(query, auto_unbox = TRUE)
 
-# Send the POST request
 response <- POST(url, body = query_json, encode = "json", content_type("application/json"))
 
-# Check if the request was successful
+
 if (status_code(response) == 200) {
-  # Save the response content directly as an Excel file
+  
   writeBin(content(response, "raw"), "scb_passenger_cars.xlsx")
   
   cat("Excel file 'scb_passenger_cars.xlsx' created successfully.\n")

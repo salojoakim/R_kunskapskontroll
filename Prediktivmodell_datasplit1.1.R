@@ -26,9 +26,7 @@ data$Modell <- fct_lump(data$Modell, n = 10)
 data <- subset(data, select = -Region)
 
 
-model_dev <- lm(log_Pris ~ poly(Age, 2) + log_Miltal + Hästkrafter +
-                Säljare + Bränsle + Växellåda + Biltyp + Drivning + Modell,
-                data = data)
+model_dev <- lm(log_Pris ~ poly(Age, 2) + log_Miltal + Hästkrafter + Säljare + Bränsle + Växellåda + Biltyp + Drivning + Modell, data = data)
 
 #checking diagnostics
 par(mfrow = c(2, 2))
@@ -41,9 +39,7 @@ train_data <- data[train_index, ]
 test_data  <- data[-train_index, ]
 
 #refitting model with train data
-model_robust <- rlm(log_Pris ~ poly(Age, 2) + log_Miltal + Hästkrafter +
-                      Säljare + Bränsle + Växellåda + Biltyp + Drivning + Modell, 
-                    data = train_data)
+model_robust <- rlm(log_Pris ~ poly(Age, 2) + log_Miltal + Hästkrafter + Säljare + Bränsle + Växellåda + Biltyp + Drivning + Modell, data = train_data)
 
 summary(model_robust)
 
@@ -59,9 +55,6 @@ MAPE_test <- mean(abs(resid_test) / test_data$Försäljningspris) * 100
 cat("TEST MAE:", round(MAE_test, 2), "\n")
 cat("TEST RMSE:", round(RMSE_test, 2), "\n")
 cat("TEST MAPE:", round(MAPE_test, 2), "%\n")
-
-
-
 
 new_data_age <- data.frame(
   Age = seq(min(data$Age), max(data$Age), length.out = 100),
